@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description"
+    content="FavAI Designer — AI-Powered TouchDesigner Script Generator. Create stunning visuals with AI.">
+  <title>FavAI Designer — AI TouchDesigner Script Generator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <!-- Animated Background -->
+  <div class="bg-animation">
+    <div class="bg-orb bg-orb-1"></div>
+    <div class="bg-orb bg-orb-2"></div>
+    <div class="bg-orb bg-orb-3"></div>
+    <div class="bg-grid"></div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div class="modal-overlay" id="settingsModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3" />
+            <path
+              d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
+          </svg>
+          Settings
+        </h2>
+        <button class="modal-close" id="closeSettings">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="apiKeyInput">OpenAI API Key</label>
+          <div class="input-with-icon">
+            <input type="password" id="apiKeyInput" placeholder="sk-..." autocomplete="off">
+            <button class="toggle-visibility" id="toggleKeyVisibility">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+            </button>
+          </div>
+          <p class="form-hint">Your API key is stored locally and never sent to our servers.</p>
+        </div>
+        <div class="form-group">
+          <label for="modelSelect">AI Model</label>
+          <select id="modelSelect">
+            <option value="gpt-4o">GPT-4o (Recommended)</option>
+            <option value="gpt-4o-mini">GPT-4o Mini (Faster)</option>
+            <option value="gpt-4-turbo">GPT-4 Turbo</option>
+          </select>
+        </div>
+        <button class="btn btn-primary btn-full" id="saveSettings">Save Settings</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- History Sidebar -->
+  <div class="sidebar" id="historySidebar">
+    <div class="sidebar-header">
+      <h2>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+          <path d="M3 3v5h5" />
+          <path d="M12 7v5l4 2" />
+        </svg>
+        History
+      </h2>
+      <button class="sidebar-close" id="closeHistory">&times;</button>
+    </div>
+    <div class="sidebar-body" id="historyList">
+      <div class="empty-state">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+          opacity="0.4">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+          <polyline points="14,2 14,8 20,8" />
+        </svg>
+        <p>No scripts generated yet</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Application -->
+  <div class="app-container">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <button class="icon-btn" id="historyBtn" title="History">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+            <path d="M3 3v5h5" />
+            <path d="M12 7v5l4 2" />
+          </svg>
+        </button>
+      </div>
+      <div class="header-center">
+        <div class="logo">
+          <div class="logo-icon">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+              <defs>
+                <linearGradient id="logoGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#a855f7" />
+                  <stop offset="50%" stop-color="#6366f1" />
+                  <stop offset="100%" stop-color="#06b6d4" />
+                </linearGradient>
+                <linearGradient id="logoGrad2" x1="100%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#f43f5e" />
+                  <stop offset="100%" stop-color="#a855f7" />
+                </linearGradient>
+              </defs>
+              <rect x="2" y="2" width="28" height="28" rx="7" fill="url(#logoGrad1)" opacity="0.15" />
+              <rect x="2" y="2" width="28" height="28" rx="7" stroke="url(#logoGrad1)" stroke-width="1.5" fill="none" />
+              <path d="M10 10L16 8L22 10L22 16L16 22L10 16Z" stroke="url(#logoGrad2)" stroke-width="1.8"
+                fill="url(#logoGrad2)" fill-opacity="0.15" />
+              <circle cx="16" cy="15" r="3" fill="url(#logoGrad1)" opacity="0.8" />
+            </svg>
+          </div>
+          <div class="logo-text">
+            <h1>FavAI <span>Designer</span></h1>
+            <p class="logo-tagline">TouchDesigner AI Script Generator</p>
+          </div>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="td-status" id="tdStatus" title="TouchDesigner Connection">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7" />
+          </svg>
+          <span id="tdStatusText">TD Offline</span>
+        </div>
+        <div class="status-indicator" id="statusIndicator" title="API Status">
+          <span class="status-dot"></span>
+          <span class="status-text">Checking...</span>
+        </div>
+        <button class="icon-btn" id="settingsBtn" title="Settings">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3" />
+            <path
+              d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Prompt Section -->
+      <section class="prompt-section">
+        <div class="prompt-card">
+          <div class="prompt-header">
+            <h2>Describe your visual</h2>
+            <p>Tell FavAI what you want to create in TouchDesigner</p>
+          </div>
+
+          <!-- Quick Category Pills -->
+          <div class="category-pills">
+            <button class="pill active" data-category="all">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon
+                  points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+              </svg>
+              All
+            </button>
+            <button class="pill" data-category="audio-reactive">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 18V5l12-2v13" />
+                <circle cx="6" cy="18" r="3" />
+                <circle cx="18" cy="16" r="3" />
+              </svg>
+              Audio Reactive
+            </button>
+            <button class="pill" data-category="generative">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+              </svg>
+              Generative
+            </button>
+            <button class="pill" data-category="feedback">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="23 4 23 10 17 10" />
+                <polyline points="1 20 1 14 7 14" />
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+              </svg>
+              Feedback Loop
+            </button>
+            <button class="pill" data-category="particles">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="1" />
+                <circle cx="19" cy="5" r="1" />
+                <circle cx="5" cy="5" r="1" />
+                <circle cx="5" cy="19" r="1" />
+                <circle cx="19" cy="19" r="1" />
+                <circle cx="12" cy="3" r="1" />
+                <circle cx="3" cy="12" r="1" />
+                <circle cx="21" cy="12" r="1" />
+                <circle cx="12" cy="21" r="1" />
+              </svg>
+              Particles
+            </button>
+            <button class="pill" data-category="glsl">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="16 18 22 12 16 6" />
+                <polyline points="8 6 2 12 8 18" />
+              </svg>
+              GLSL Shader
+            </button>
+            <button class="pill" data-category="text">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="4 7 4 4 20 4 20 7" />
+                <line x1="9" y1="20" x2="15" y2="20" />
+                <line x1="12" y1="4" x2="12" y2="20" />
+              </svg>
+              Text/Typo
+            </button>
+            <button class="pill" data-category="3d">3D</button>
+            <button class="pill" data-category="vj">🎛️ VJ</button>
+            <button class="pill" data-category="interactive">📷 Interactive</button>
+            <button class="pill" data-category="tunnel">🌀 Tunnel</button>
+            <button class="pill" data-category="fluid">💧 Fluid</button>
+            <button class="pill" data-category="glitch">⚡ Glitch</button>
+            <button class="pill" data-category="mapping">📐 Mapping</button>
+            <button class="pill" data-category="led">💡 LED</button>
+            <button class="pill" data-category="optical">👁️ Optical Flow</button>
+          </div>
+
+          <!-- Prompt Input -->
+          <div class="prompt-input-wrapper">
+            <textarea id="promptInput"
+              placeholder="e.g., Create an audio reactive particle system with neon colors and feedback loop..."
+              rows="3"></textarea>
+            <div class="prompt-actions">
+              <div class="char-count"><span id="charCount">0</span> / 1000</div>
+              <button class="btn btn-generate" id="generateBtn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                </svg>
+                <span>Generate Script</span>
+                <div class="btn-shine"></div>
+              </button>
+            </div>
+          </div>
+
+          <!-- Quick Prompts -->
+          <div class="quick-prompts">
+            <span class="quick-label">Try:</span>
+            <button class="quick-prompt"
+              data-prompt="Create a mesmerizing audio reactive visual with feedback loop and neon color palette">🎵
+              Audio reactive</button>
+            <button class="quick-prompt" data-prompt="Build a VJ performance multi-layer system with crossfade">🎛️ VJ
+              Performance</button>
+            <button class="quick-prompt"
+              data-prompt="Create an interactive webcam visual with edge detection and feedback">📷 Webcam
+              interactive</button>
+            <button class="quick-prompt" data-prompt="Build a tunnel wormhole effect with rotating feedback">🌀 Tünel
+              efekti</button>
+            <button class="quick-prompt"
+              data-prompt="Create a fluid organic flow with double displacement and color evolution">💧 Akışkan
+              sıvı</button>
+            <button class="quick-prompt"
+              data-prompt="Build a glitch datamosh art with pixel displacement and scan lines">⚡ Glitch art</button>
+            <button class="quick-prompt"
+              data-prompt="Create a projection mapping base with multiple zones and keystone">📐 Mapping</button>
+            <button class="quick-prompt" data-prompt="Build an LED wall stage design with pixelated output">💡 LED
+              duvar</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Output Section -->
+      <section class="output-section" id="outputSection">
+        <div class="output-card">
+          <div class="output-header">
+            <div class="output-title">
+              <div class="output-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="16 18 22 12 16 6" />
+                  <polyline points="8 6 2 12 8 18" />
+                </svg>
+              </div>
+              <div>
+                <h3>Generated Script</h3>
+                <p class="output-source" id="outputSource"></p>
+              </div>
+            </div>
+            <div class="output-actions">
+              <button class="btn btn-send-td btn-sm" id="sendToTdBtn" title="Send to TouchDesigner">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+                <span>Send to TD</span>
+              </button>
+              <button class="btn btn-secondary btn-sm" id="copyBtn" title="Copy to clipboard">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                </svg>
+                <span>Copy</span>
+              </button>
+              <button class="btn btn-secondary btn-sm" id="downloadBtn" title="Download as .py file">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+                <span>Download</span>
+              </button>
+            </div>
+          </div>
+          <div class="code-container">
+            <div class="code-line-numbers" id="lineNumbers"></div>
+            <pre class="code-content" id="codeOutput"></pre>
+          </div>
+          <div class="output-footer">
+            <div class="output-stats" id="outputStats"></div>
+            <div class="td-instructions">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="16" x2="12" y2="12" />
+                <line x1="12" y1="8" x2="12.01" y2="8" />
+              </svg>
+              <span>Paste this script into a <strong>Text DAT</strong> in TouchDesigner and press
+                <strong>Ctrl+R</strong> to run</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Loading State -->
+      <section class="loading-section" id="loadingSection">
+        <div class="loading-card">
+          <div class="loading-animation">
+            <div class="loading-ring">
+              <div class="loading-ring-inner"></div>
+            </div>
+            <div class="loading-particles">
+              <span></span><span></span><span></span><span></span><span></span><span></span>
+            </div>
+          </div>
+          <h3>Generating your TouchDesigner script...</h3>
+          <p>FavAI is crafting the perfect visual network for you</p>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p>FavAI Designer v2.0 — 16 Templates • AI Mode • TD Bridge — Built with ❤️ for the TouchDesigner community</p>
+    </footer>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="/js/app.js"></script>
+</body>
+
+</html>
