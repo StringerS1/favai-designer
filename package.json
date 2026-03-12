@@ -1,6 +1,6 @@
 {
   "name": "favai-designer",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "FavAI Designer — AI-Powered TouchDesigner Script Generator",
   "main": "server.js",
   "scripts": {

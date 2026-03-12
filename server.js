@@ -2,24 +2,37 @@ require('dotenv').config();
 const express = require('express');
 const http = require('http');
 const cors = require('cors');
-const { WebSocketServer } = require('ws');
 const OpenAI = require('openai');
 const fs = require('fs');
 const path = require('path');
 const newTemplates = require('./new-templates');
+
+// Only require ws in non-serverless environments
+let WebSocketServer;
+try {
+  if (!process.env.VERCEL) {
+    WebSocketServer = require('ws').WebSocketServer;
+  }
+} catch (e) { /* ws not available in serverless */ }
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
 
-// Load TD system prompt
-const systemPrompt = fs.readFileSync(
-  path.join(__dirname, 'td-context', 'system-prompt.txt'),
-  'utf-8'
-);
+// Load TD system prompt (with fallback for serverless)
+let systemPrompt = '';
+try {
+  systemPrompt = fs.readFileSync(
+    path.join(__dirname, 'td-context', 'system-prompt.txt'),
+    'utf-8'
+  );
+} catch (e) {
+  console.warn('Could not load system-prompt.txt, using fallback');
+  systemPrompt = 'You are FavAI Designer, an expert AI assistant specialized in generating TouchDesigner Python scripts.';
+}
 
 // Store API key in memory (can be updated via settings)
 let apiKey = process.env.OPENAI_API_KEY || '';
@@ -1158,30 +1171,12 @@ null_out.display = True
 print("✅ FavAI Designer: Kaleidoscope setup complete!")`
 };
 
-module.exports = { generateTemplateScript, templates };
-
 // ============================================
 // WEBSOCKET SERVER for TouchDesigner Bridge
+// (Only in non-serverless / local environments)
 // ============================================
 
-const server = http.createServer(app);
-const wss = new WebSocketServer({ server, path: '/ws' });
 let tdClients = new Set();
-
-wss.on('connection', (ws) => {
-  console.log('[WS] TouchDesigner connected!');
-  tdClients.add(ws);
-  ws.on('close', () => {
-    tdClients.delete(ws);
-    console.log('[WS] TouchDesigner disconnected');
-  });
-  ws.on('message', (data) => {
-    try {
-      const msg = JSON.parse(data);
-      console.log('[WS] TD message:', msg.type);
-    } catch (e) { }
-  });
-});
 
 // Send script to TouchDesigner
 app.post('/api/send-to-td', (req, res) => {
@@ -1202,12 +1197,37 @@ app.get('/api/td-status', (req, res) => {
 
 // Serve TD bridge script
 app.get('/api/td-bridge-script', (req, res) => {
-  const script = fs.readFileSync(path.join(__dirname, 'td-bridge', 'favai_bridge.py'), 'utf-8');
-  res.type('text/plain').send(script);
+  try {
+    const script = fs.readFileSync(path.join(__dirname, 'td-bridge', 'favai_bridge.py'), 'utf-8');
+    res.type('text/plain').send(script);
+  } catch (e) {
+    res.status(404).json({ error: 'Bridge script not found' });
+  }
 });
 
 // Only start server when run directly (not when imported by Vercel)
 if (require.main === module) {
+  const server = http.createServer(app);
+
+  // WebSocket only in local mode
+  if (WebSocketServer) {
+    const wss = new WebSocketServer({ server, path: '/ws' });
+    wss.on('connection', (ws) => {
+      console.log('[WS] TouchDesigner connected!');
+      tdClients.add(ws);
+      ws.on('close', () => {
+        tdClients.delete(ws);
+        console.log('[WS] TouchDesigner disconnected');
+      });
+      ws.on('message', (data) => {
+        try {
+          const msg = JSON.parse(data);
+          console.log('[WS] TD message:', msg.type);
+        } catch (e) { }
+      });
+    });
+  }
+
   server.listen(PORT, () => {
     console.log(`
 ╔══════════════════════════════════════════════╗
@@ -1223,5 +1243,5 @@ if (require.main === module) {
   });
 }
 
-// Export for Vercel
+// Export for Vercel serverless
 module.exports = app;
