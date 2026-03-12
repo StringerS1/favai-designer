@@ -197,14 +197,14 @@ for c in parent().children:
 # ========================================
 
 # Audio device input
-audioIn = parent().create(audiodevinCHOP, 'audio_in')
+audioIn = parent().create(audiodeviceinCHOP, 'audio_in')
 audioIn.nodeX = -400
 audioIn.nodeY = 0
 audioIn.color = (0.2, 0.5, 0.8)
 audioIn.comment = 'Audio Input Device'
 
 # Spectrum analysis
-spectrum = parent().create(audiospectrumCHOP, 'spectrum')
+spectrum = parent().create(audiospectrumCHOP, 'spectrum')  # audiospectrumCHOP is correct
 spectrum.nodeX = -200
 spectrum.nodeY = 0
 spectrum.color = (0.2, 0.5, 0.8)
@@ -248,7 +248,7 @@ noise.comment = 'Main Noise Pattern'
 noise.par.t.expr = "absTime.seconds * 0.05"
 
 # HSV adjust for colorful output
-hsv = parent().create(hsvAdjustTOP, 'hsv_adjust')
+hsv = parent().create(hsvadjustTOP, 'hsv_adjust')
 hsv.par.resolutionw = 1920
 hsv.par.resolutionh = 1080
 hsv.nodeX = -200
@@ -298,7 +298,18 @@ level.outputConnectors[0].connect(null_out.inputConnectors[0])
 null_out.viewer = True
 null_out.display = True
 
-print("✅ FavAI Designer: Audio Reactive setup complete!")`,
+print("✅ FavAI Designer: Audio Reactive setup complete!")
+
+# --- Created Nodes ---
+# audio_in (audiodeviceinCHOP)
+# spectrum (audiospectrumCHOP)
+# analyze (analyzeCHOP)
+# lag (lagCHOP)
+# noise_visual (noiseTOP)
+# hsv_adjust (hsvadjustTOP)
+# audio_transform (transformTOP)
+# level (levelTOP)
+# OUT (nullTOP)`,
 
   feedbackLoop: `# FavAI Designer — Feedback Loop Visual
 # Paste this script into a Text DAT and run it in TouchDesigner
@@ -361,7 +372,7 @@ noise.outputConnectors[0].connect(comp.inputConnectors[0])
 transform.outputConnectors[0].connect(comp.inputConnectors[1])
 
 # HSV Adjust for color cycling
-hsv = parent().create(hsvAdjustTOP, 'color_cycle')
+hsv = parent().create(hsvadjustTOP, 'color_cycle')
 hsv.par.resolutionw = 1920
 hsv.par.resolutionh = 1080
 hsv.par.hueoffset.expr = "absTime.seconds * 10"
@@ -397,7 +408,16 @@ level.outputConnectors[0].connect(null_out.inputConnectors[0])
 null_out.viewer = True
 null_out.display = True
 
-print("✅ FavAI Designer: Feedback Loop setup complete!")`,
+print("✅ FavAI Designer: Feedback Loop setup complete!")
+
+# --- Created Nodes ---
+# noise_src (noiseTOP)
+# feedback (feedbackTOP)
+# fb_transform (transformTOP)
+# composite (compositeTOP)
+# color_cycle (hsvadjustTOP)
+# level (levelTOP)
+# OUT (nullTOP)`,
 
   generativeNoise: `# FavAI Designer — Generative Abstract Visual
 # Paste this script into a Text DAT and run it in TouchDesigner
@@ -462,7 +482,7 @@ noise2.outputConnectors[0].connect(displace.inputConnectors[1])
 # ========================================
 
 # HSV for evolving color palette
-hsv = parent().create(hsvAdjustTOP, 'color_palette')
+hsv = parent().create(hsvadjustTOP, 'color_palette')
 hsv.par.resolutionw = 1920
 hsv.par.resolutionh = 1080
 hsv.par.hueoffset.expr = "absTime.seconds * 8"
@@ -544,7 +564,19 @@ level.outputConnectors[0].connect(null_out.inputConnectors[0])
 null_out.viewer = True
 null_out.display = True
 
-print("✅ FavAI Designer: Generative Abstract setup complete!")`,
+print("✅ FavAI Designer: Generative Abstract setup complete!")
+
+# --- Created Nodes ---
+# noise_primary (noiseTOP)
+# noise_detail (noiseTOP)
+# displace (displaceTOP)
+# color_palette (hsvadjustTOP)
+# gradient (rampTOP)
+# blend (compositeTOP)
+# edge (edgeTOP)
+# add_edge (compositeTOP)
+# final_level (levelTOP)
+# OUT (nullTOP)`,
 
   particleSystem: `# FavAI Designer — 3D Particle System
 # Paste this script into a Text DAT and run it in TouchDesigner
@@ -621,7 +653,7 @@ light.nodeY = 0
 light.color = (0.8, 0.8, 0.2)
 
 # Point sprite material
-mat = parent().create(pointSpriteMAT, 'point_mat')
+mat = parent().create(pointspriteMAT, 'point_mat')
 mat.par.pointcolorr = 0.3
 mat.par.pointcolorg = 0.7
 mat.par.pointcolorb = 1.0
@@ -673,7 +705,20 @@ addGlow.outputConnectors[0].connect(null_out.inputConnectors[0])
 null_out.viewer = True
 null_out.display = True
 
-print("✅ FavAI Designer: Particle System setup complete!")`,
+print("✅ FavAI Designer: Particle System setup complete!")
+
+# --- Created Nodes ---
+# emitter_grid (gridSOP)
+# geo_noise (noiseSOP)
+# particles (particleSOP)
+# geo_render (geometryCOMP)
+# camera (cameraCOMP)
+# light (lightCOMP)
+# point_mat (pointspriteMAT)
+# render (renderTOP)
+# glow (blurTOP)
+# add_glow (compositeTOP)
+# OUT (nullTOP)`,
 
   textVisual: `# FavAI Designer — Animated Text Visual
 # Paste this script into a Text DAT and run it in TouchDesigner
@@ -757,7 +802,7 @@ displace.outputConnectors[0].connect(comp.inputConnectors[0])
 edge.outputConnectors[0].connect(comp.inputConnectors[1])
 
 # HSV color animation
-hsv = parent().create(hsvAdjustTOP, 'color_anim')
+hsv = parent().create(hsvadjustTOP, 'color_anim')
 hsv.par.resolutionw = 1920
 hsv.par.resolutionh = 1080
 hsv.par.hueoffset.expr = "absTime.seconds * 20"
@@ -800,7 +845,18 @@ addGlow.outputConnectors[0].connect(null_out.inputConnectors[0])
 null_out.viewer = True
 null_out.display = True
 
-print("✅ FavAI Designer: Text Visual setup complete!")`,
+print("✅ FavAI Designer: Text Visual setup complete!")
+
+# --- Created Nodes ---
+# main_text (textTOP)
+# displace_noise (noiseTOP)
+# text_displace (displaceTOP)
+# text_edge (edgeTOP)
+# comp (compositeTOP)
+# color_anim (hsvadjustTOP)
+# glow (blurTOP)
+# add_glow (compositeTOP)
+# OUT (nullTOP)`,
 
   glslShader: `# FavAI Designer — Custom GLSL Shader
 # Paste this script into a Text DAT and run it in TouchDesigner
@@ -879,7 +935,7 @@ void main() {
 """
 
 # GLSL TOP
-glsl = parent().create(glslTOP, 'glsl_shader')
+glsl = parent().create(glslmultiTOP, 'glsl_shader')
 glsl.par.resolutionw = 1920
 glsl.par.resolutionh = 1080
 glsl.nodeX = -200
@@ -910,7 +966,13 @@ level.outputConnectors[0].connect(null_out.inputConnectors[0])
 null_out.viewer = True
 null_out.display = True
 
-print("✅ FavAI Designer: GLSL Shader setup complete!")`,
+print("✅ FavAI Designer: GLSL Shader setup complete!")
+
+# --- Created Nodes ---
+# shader_code (textDAT)
+# glsl_shader (glslmultiTOP)
+# final_level (levelTOP)
+# OUT (nullTOP)`,
 
   instancing: `# FavAI Designer — 3D Instancing System
 # Paste this script into a Text DAT and run it in TouchDesigner
@@ -1042,7 +1104,20 @@ comp.outputConnectors[0].connect(null_out.inputConnectors[0])
 null_out.viewer = True
 null_out.display = True
 
-print("✅ FavAI Designer: Instancing System setup complete!")`,
+print("✅ FavAI Designer: Instancing System setup complete!")
+
+# --- Created Nodes ---
+# pos_noise (noiseCHOP)
+# rot_pattern (patternCHOP)
+# instance_shape (boxSOP)
+# instanced_geo (geometryCOMP)
+# cam (cameraCOMP)
+# light (lightCOMP)
+# pbr_mat (pbrMAT)
+# render (renderTOP)
+# bloom (blurTOP)
+# add_bloom (compositeTOP)
+# OUT (nullTOP)`,
 
   kaleidoscope: `# FavAI Designer — Kaleidoscope Mirror Effect
 # Paste this script into a Text DAT and run it in TouchDesigner
@@ -1070,7 +1145,7 @@ noise.color = (0.6, 0.2, 0.8)
 noise.comment = 'Source Pattern'
 
 # HSV for vivid colors
-hsv = parent().create(hsvAdjustTOP, 'vivid')
+hsv = parent().create(hsvadjustTOP, 'vivid')
 hsv.par.resolutionw = 1920
 hsv.par.resolutionh = 1080
 hsv.par.saturationmult = 2.0
@@ -1168,7 +1243,18 @@ level.outputConnectors[0].connect(null_out.inputConnectors[0])
 null_out.viewer = True
 null_out.display = True
 
-print("✅ FavAI Designer: Kaleidoscope setup complete!")`
+print("✅ FavAI Designer: Kaleidoscope setup complete!")
+
+# --- Created Nodes ---
+# source_noise (noiseTOP)
+# vivid (hsvadjustTOP)
+# mirror_h (flipTOP)
+# kaleido_h (compositeTOP)
+# mirror_v (flipTOP)
+# kaleido_v (compositeTOP)
+# rotate (transformTOP)
+# normalize (levelTOP)
+# OUT (nullTOP)`
 };
 
 // ============================================

@@ -1,4 +1,5 @@
 // FavAI Designer — New Templates (VJ, Interactive, Tunnel, Fluid, Glitch, Mapping, LED, Optical Flow)
+// ALL operator class names are VERIFIED TouchDesigner Python API names (lowercase before suffix)
 
 const newTemplates = {
 
@@ -43,7 +44,7 @@ transform.nodeX = -200; transform.nodeY = 0; transform.color = (0.5, 0.3, 0.7)
 switch.outputConnectors[0].connect(transform.inputConnectors[0])
 
 # HSV color cycling
-hsv = parent().create(hsvAdjustTOP, 'vj_color')
+hsv = parent().create(hsvadjustTOP, 'vj_color')
 hsv.par.resolutionw = 1920; hsv.par.resolutionh = 1080
 hsv.par.hueoffset.expr = "absTime.seconds * 25"
 hsv.par.saturationmult = 1.6
@@ -63,14 +64,19 @@ null_out.nodeX = 400; null_out.nodeY = 0; null_out.color = (0.2, 0.8, 0.3)
 null_out.comment = 'VJ OUTPUT'
 level.outputConnectors[0].connect(null_out.inputConnectors[0])
 null_out.viewer = True; null_out.display = True
-print("✅ FavAI: VJ Performance setup complete!")`,
+print("✅ FavAI: VJ Performance setup complete!")
+
+# --- Created Nodes ---
+# layer_a (noiseTOP), layer_b (rampTOP), crossfade_lfo (lfoCHOP)
+# layer_switch (switchTOP), vj_transform (transformTOP)
+# vj_color (hsvadjustTOP), vj_level (levelTOP), OUT (nullTOP)`,
 
     interactive: `# FavAI Designer — Interactive Webcam Visual
 for c in parent().children:
     if c.name != me.name: c.destroy()
 
 # Webcam input
-cam = parent().create(videoDeviceInTOP, 'webcam')
+cam = parent().create(videodeviceinTOP, 'webcam')
 cam.par.resolutionw = 1920; cam.par.resolutionh = 1080
 cam.nodeX = -600; cam.nodeY = 0; cam.color = (0.2, 0.6, 0.8)
 cam.comment = 'Webcam Input'
@@ -102,7 +108,7 @@ edge.outputConnectors[0].connect(comp.inputConnectors[0])
 fbTransform.outputConnectors[0].connect(comp.inputConnectors[1])
 
 # HSV color
-hsv = parent().create(hsvAdjustTOP, 'color')
+hsv = parent().create(hsvadjustTOP, 'color')
 hsv.par.resolutionw = 1920; hsv.par.resolutionh = 1080
 hsv.par.hueoffset.expr = "absTime.seconds * 15"
 hsv.par.saturationmult = 2.0
@@ -123,7 +129,12 @@ null_out.nodeX = 200; null_out.nodeY = 0; null_out.color = (0.2, 0.8, 0.3)
 null_out.comment = 'INTERACTIVE OUTPUT'
 hsv.outputConnectors[0].connect(null_out.inputConnectors[0])
 null_out.viewer = True; null_out.display = True
-print("✅ FavAI: Interactive Webcam setup complete!")`,
+print("✅ FavAI: Interactive Webcam setup complete!")
+
+# --- Created Nodes ---
+# webcam (videodeviceinTOP), cam_edge (edgeTOP), fb (feedbackTOP)
+# fb_xform (transformTOP), mix (compositeTOP), color (hsvadjustTOP)
+# fb_level (levelTOP), OUT (nullTOP)`,
 
     tunnel: `# FavAI Designer — Tunnel / Wormhole Effect
 for c in parent().children:
@@ -159,7 +170,7 @@ noise.outputConnectors[0].connect(comp.inputConnectors[0])
 transform.outputConnectors[0].connect(comp.inputConnectors[1])
 
 # HSV
-hsv = parent().create(hsvAdjustTOP, 'color')
+hsv = parent().create(hsvadjustTOP, 'color')
 hsv.par.resolutionw = 1920; hsv.par.resolutionh = 1080
 hsv.par.hueoffset.expr = "absTime.seconds * 20"
 hsv.par.saturationmult = 1.5
@@ -179,7 +190,11 @@ null_out.nodeX = 400; null_out.nodeY = 0; null_out.color = (0.2, 0.8, 0.3)
 null_out.comment = 'TUNNEL OUTPUT'
 level.outputConnectors[0].connect(null_out.inputConnectors[0])
 null_out.viewer = True; null_out.display = True
-print("✅ FavAI: Tunnel Effect setup complete!")`,
+print("✅ FavAI: Tunnel Effect setup complete!")
+
+# --- Created Nodes ---
+# tunnel_noise (noiseTOP), fb (feedbackTOP), tunnel_xform (transformTOP)
+# mix (compositeTOP), color (hsvadjustTOP), level (levelTOP), OUT (nullTOP)`,
 
     fluid: `# FavAI Designer — Fluid / Organic Flow
 for c in parent().children:
@@ -223,7 +238,7 @@ disp.outputConnectors[0].connect(disp2.inputConnectors[0])
 n3.outputConnectors[0].connect(disp2.inputConnectors[1])
 
 # Slow color evolution
-hsv = parent().create(hsvAdjustTOP, 'fluid_color')
+hsv = parent().create(hsvadjustTOP, 'fluid_color')
 hsv.par.resolutionw = 1920; hsv.par.resolutionh = 1080
 hsv.par.hueoffset.expr = "absTime.seconds * 5"
 hsv.par.saturationmult = 1.6; hsv.par.valuemult = 1.1
@@ -243,7 +258,12 @@ null_out.nodeX = 400; null_out.nodeY = 0; null_out.color = (0.2, 0.8, 0.3)
 null_out.comment = 'FLUID OUTPUT'
 blur.outputConnectors[0].connect(null_out.inputConnectors[0])
 null_out.viewer = True; null_out.display = True
-print("✅ FavAI: Fluid Flow setup complete!")`,
+print("✅ FavAI: Fluid Flow setup complete!")
+
+# --- Created Nodes ---
+# flow_a (noiseTOP), flow_displace (noiseTOP), fluid_disp (displaceTOP)
+# flow_b (noiseTOP), fluid_disp2 (displaceTOP), fluid_color (hsvadjustTOP)
+# soft (blurTOP), OUT (nullTOP)`,
 
     glitch: `# FavAI Designer — Glitch / Data Mosh Art
 for c in parent().children:
@@ -299,7 +319,12 @@ null_out.nodeX = 400; null_out.nodeY = 0; null_out.color = (0.2, 0.8, 0.3)
 null_out.comment = 'GLITCH OUTPUT'
 level.outputConnectors[0].connect(null_out.inputConnectors[0])
 null_out.viewer = True; null_out.display = True
-print("✅ FavAI: Glitch Art setup complete!")`,
+print("✅ FavAI: Glitch Art setup complete!")
+
+# --- Created Nodes ---
+# glitch_src (noiseTOP), rgb_split (reorderTOP), glitch_noise (noiseTOP)
+# glitch_disp (displaceTOP), scan_lines (transformTOP)
+# glitch_level (levelTOP), OUT (nullTOP)`,
 
     mapping: `# FavAI Designer — Projection Mapping Base
 for c in parent().children:
@@ -312,7 +337,7 @@ noise.par.monochrome = False; noise.par.period = 4.0; noise.par.harmonics = 5
 noise.par.t.expr = "absTime.seconds * 0.03"
 noise.nodeX = -600; noise.nodeY = 0; noise.color = (0.5, 0.3, 0.8)
 
-hsv = parent().create(hsvAdjustTOP, 'color')
+hsv = parent().create(hsvadjustTOP, 'color')
 hsv.par.resolutionw = 1920; hsv.par.resolutionh = 1080
 hsv.par.hueoffset.expr = "absTime.seconds * 10"
 hsv.par.saturationmult = 1.5
@@ -359,7 +384,12 @@ null_out.nodeX = 400; null_out.nodeY = 0; null_out.color = (0.2, 0.8, 0.3)
 null_out.comment = 'MAPPING OUTPUT'
 comp.outputConnectors[0].connect(null_out.inputConnectors[0])
 null_out.viewer = True; null_out.display = True
-print("✅ FavAI: Projection Mapping setup complete!")`,
+print("✅ FavAI: Projection Mapping setup complete!")
+
+# --- Created Nodes ---
+# content (noiseTOP), color (hsvadjustTOP), zone_a (cropTOP)
+# zone_b (cropTOP), keystone_a (transformTOP), keystone_b (transformTOP)
+# final_comp (compositeTOP), OUT (nullTOP)`,
 
     ledWall: `# FavAI Designer — LED Wall / Stage Design
 for c in parent().children:
@@ -378,7 +408,7 @@ noise.par.t.expr = "absTime.seconds * 0.04"
 noise.nodeX = -600; noise.nodeY = 0; noise.color = (0.5, 0.2, 0.8)
 
 # Color palette
-hsv = parent().create(hsvAdjustTOP, 'palette')
+hsv = parent().create(hsvadjustTOP, 'palette')
 hsv.par.resolutionw = 1920; hsv.par.resolutionh = 1080
 hsv.par.hueoffset.expr = "absTime.seconds * 30"
 hsv.par.saturationmult = 2.0
@@ -414,7 +444,12 @@ null_out.nodeX = 400; null_out.nodeY = 0; null_out.color = (0.2, 0.8, 0.3)
 null_out.comment = 'LED WALL OUTPUT'
 level.outputConnectors[0].connect(null_out.inputConnectors[0])
 null_out.viewer = True; null_out.display = True
-print("✅ FavAI: LED Wall setup complete!")`,
+print("✅ FavAI: LED Wall setup complete!")
+
+# --- Created Nodes ---
+# led_dot (circleTOP), led_content (noiseTOP), palette (hsvadjustTOP)
+# pixelate (resolutionTOP), scale_up (resolutionTOP)
+# led_level (levelTOP), OUT (nullTOP)`,
 
     opticalFlow: `# FavAI Designer — Optical Flow Reactive
 for c in parent().children:
@@ -457,7 +492,7 @@ noiseA.outputConnectors[0].connect(disp.inputConnectors[0])
 blur.outputConnectors[0].connect(disp.inputConnectors[1])
 
 # HSV color shift
-hsv = parent().create(hsvAdjustTOP, 'flow_color')
+hsv = parent().create(hsvadjustTOP, 'flow_color')
 hsv.par.resolutionw = 1920; hsv.par.resolutionh = 1080
 hsv.par.hueoffset.expr = "absTime.seconds * 12"
 hsv.par.saturationmult = 1.4
@@ -477,7 +512,12 @@ null_out.nodeX = 400; null_out.nodeY = 0; null_out.color = (0.2, 0.8, 0.3)
 null_out.comment = 'OPTICAL FLOW OUTPUT'
 level.outputConnectors[0].connect(null_out.inputConnectors[0])
 null_out.viewer = True; null_out.display = True
-print("✅ FavAI: Optical Flow setup complete!")`
+print("✅ FavAI: Optical Flow setup complete!")
+
+# --- Created Nodes ---
+# field_a (noiseTOP), prev_frame (cacheTOP), motion_diff (compositeTOP)
+# motion_blur (blurTOP), flow_disp (displaceTOP)
+# flow_color (hsvadjustTOP), flow_level (levelTOP), OUT (nullTOP)`
 
 };
 
